@@ -1,0 +1,18 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Terraform directories
+.terraform
+
+# Terraform files
+.terraform.lock.hcl
+*tfstate*
+ec2_runner.tf
+
+# Keys file
+*.pem
+GitHub_PAT.yaml

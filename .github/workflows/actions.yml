@@ -1,0 +1,48 @@
+name: Serverless Deployment
+on:
+  push:
+    branches:
+      - main
+# permission can be added at job level or workflow level    
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    
+jobs:
+  deployment-master:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials Master Account
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE_MASTER }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Node config
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - run: "cd ./serverless && npm install -g serverless"
+      - name: Deploy Serverless
+        run: "cd ./serverless && serverless deploy --verbose"
+      - name: Remove all Serverless resources
+        run: "cd ./serverless && serverless remove --verbose"
+  deployment-slave:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials Slave Account
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE_SLAVE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Node config
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - run: "cd ./serverless && npm install -g serverless"
+      - name: Deploy Serverless
+        run: "cd ./serverless && serverless deploy --verbose"
+      - name: Remove all Serverless resources
+        run: "cd ./serverless && serverless remove --verbose"

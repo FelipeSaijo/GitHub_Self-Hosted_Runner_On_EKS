@@ -1,0 +1,28 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: runner-deployment
+  namespace: self-hosted-runners
+spec:
+  replicas: 1
+  template:
+    spec:
+      repository: "FelipeSaijo/serverless-framework-AWS-runner"
+      #organization: "FelipeSaijo" Possible way, this will make the runner to list all repositories
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: runners-deployment-autoscaler
+  namespace: self-hosted-runners
+spec:
+  scaleTargetRef:
+    name: runner-deployment
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: PercentageRunnersBusy
+    scaleUpThreshold: '0.75'
+    scaleDownThreshold: '0.25'
+    scaleUpFactor: '2'
+    scaleDownFactor: '0.5'
